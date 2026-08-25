@@ -56,7 +56,7 @@ function checkSpawnsRemaining(string) {
 //-------------------------READY HANDLER+SPAMMER-----------------------//
 
 client.on('ready', () => {
-    console.log("https://github.com/AkshatOP/Poketwo-Autocatcher")
+    console.log("https://github.com/abhii-3007/poketwoAC")
     console.log(`Acount: ${client.user.username} is ONLINE, `)
     console.log("Note: When your using Incense then make sure it occurs in a separate channel where hint bots like pokename/sierra aren't enabled to send message there!")
     console.log("Use $help to know about commands")
@@ -112,7 +112,7 @@ client.on('messageCreate', async message => {
 
     if (message.content === "$help" && message.author.id === config.OwnerID) {
         await message.channel.send(
-            "``` Poketwo-Autocatcher\n Link: https://github.com/AkshatOP/Poketwo-Autocatcher\n\n $captcha_completed : Use to restart the bot once captcha is solved\n $say <content> : Make the bot say whatever you want\n $react <messageID> : React with ✅ emoji\n $click <messageID> : Clicks the button which has ✅ emoji\n $help : To show this message ```"
+            "``` Poketwo-Autocatcher\n\n $captcha_completed : Use to restart the bot once captcha is solved\n $say <content> : Make the bot say whatever you want\n $react <messageID> : React with ✅ emoji\n $click <messageID> : Clicks the button which has ✅ emoji\n $help : To show this message ```"
         )
     }
 
