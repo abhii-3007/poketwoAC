@@ -5,10 +5,6 @@ A second generation **free** and open-source Pokétwo autocatcher, created with 
 
 😄😇 **Star this Repo if you find it useful**
 
----
-
-### Youtube Tutorial
-https://www.youtube.com/watch?v=Qqog9HaNU8Y
 
 ---
 
@@ -30,11 +26,9 @@ The bot has the following features:
 ### Requirements
 Please note that this autocatcher requires NODEJS installed on your system or in any other platform you are trying to run it onto
 
-## Invite Poke Name Bot to make the autocatcher run . [Invite Link](https://discord.com/oauth2/authorize?client_id=874910942490677270&permissions=412317379648&scope=applications.commands%20bot)
-## Alternatively You can invite Sierra too! [Invite link](https://discord.com/oauth2/authorize?client_id=696161886734909481&permissions=8&scope=bot%20applications.commands)(but i prefer only use pokename only)
 
 #### <b>Running the bot</b>
-To start up the bot for the first time, STAR THIS REPO then clone the repo by this link to your local machine or replit (wherever you wish) [click here](https://github.com/AkshatOP/Poketwo-Autocatcher.git) 
+To start up the bot for the first time, STAR THIS REPO then clone the repo by this link to your local machine or replit (wherever you wish) [click here](https://github.com/abhii-3007/poketwoAC.git) 
 Once you have done that hit `npm install` in console.
 
 ## **Specific Channel Support**
@@ -67,8 +61,6 @@ This will allow the bot to use your preferred channel to log the errors of code 
 ##### <b>OwnerID</b>:
 This will be the user-ID of the account controlling the bot (for using "$say" and "$captcha_completed" command)  
 
-##### <b>ocrSpaceApiKey</b>:
-This is the MOST IMPORTANT part. You have to create an ocrSpace account and put it's API key. Click [here](https://ocr.space/ocrapi/freekey) to get free API-KEY
 
 After you've entered that in, the autocatcher should start successfully. (if not, check if you have entered in the right fields)
 
@@ -88,20 +80,5 @@ If you want to contribute to the community Please post the json you made after a
 ## **DISCLAIMER**
 
 Please note that self botting is against Discord's Terms of Service and being discovered using a self bot may result in your account being banned. To avoid this, keep knowledge of your self bot to a minimum and use a throwaway account. I am not responsible for any accounts lost due to the self bot. I also recommend checking the self bot channel's messages occasionally to see if Pokétwo has sent a captcha. **If it has, it would be a good idea to solve it.**
-
----
-
-## Support Server 
-[Click here to join support server](https://discord.gg/FJD29BV8Np)
-
----
-
-## Acknowledgements
-### Creators
-* 🔥⃤•AK_ØPᵈᵉᵛ✓#6326 [Click to DM](https://discordapp.com/users/503928755341885450)
-* akshatop [Click to DM](https://discordapp.com/users/503928755341885450)
-
-### Contributors
-* 🔥⃤•AK_ØPᵈᵉᵛ✓#6326 
 
 ---
