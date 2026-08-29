@@ -9,7 +9,7 @@ const Discord = require("discord.js-selfbot-v13");
 const client = new Discord.Client({
     checkUpdate: false
 });
-const express = require('express'); // Fixed broken import here
+const express = require('express');
 const {
     solveHint,
     checkRarity
@@ -33,17 +33,6 @@ app.listen(process.env.PORT || 3000);
 
 //--------------------------------------------------------------//
 
-//-------------------------SOME EXTRA FUNCTIONS----------------------------//
-
-function checkSpawnsRemaining(string) {
-    const match = string.match(/Spawns Remaining: (\d+)/);
-    if (match) {
-        const spawnsRemaining = parseInt(match[1]);
-        console.log(spawnsRemaining);
-    }
-}
-//--------------------------------------------------------------------------//
-
 //-------------------------READY HANDLER+SPAMMER-----------------------//
 
 client.on('ready', () => {
@@ -59,7 +48,7 @@ client.on('ready', () => {
     }
 
     function spam() {
-        if (!channel) return; // Added safety check in case the channel ID is invalid
+        if (!channel) return;
         const result = Math.random().toString(36).substring(2, 15);
         channel.send(result);
         const randomInterval = getRandomInterval(1500, 5000); // Random interval for spam between 1.5 seconds and 5 seconds
@@ -70,11 +59,10 @@ client.on('ready', () => {
 
 //------------------------------------------------------------//
 
-
 //-------------------------Anti-Crash-------------------------//
 
 process.on("unhandledRejection", (reason, p) => {
-    if (reason == "Error: Unable to identify that pokemon.") { } else {
+    if (reason == "Error: Unable to identify that pokemon." || reason?.name === "Error [INTERACTION_COLLECTOR_ERROR]") { } else {
         console.log(" [antiCrash] :: Unhandled Rejection/Catch");
         console.log(reason, p);
     }
@@ -97,6 +85,11 @@ process.on("multipleResolves", (type, promise, reason) => {
 //----------------------------AUTOCATCHER--------------------------------------//
 
 client.on('messageCreate', async message => {
+    // Check if channel is allowed
+    if (message.author.id === "716390085896962058" || message.author.id === "854233015475109888") {
+        if (allowedChannels.length > 0 && !allowedChannels.includes(message.channel.id)) return;
+    }
+
     if (message.content === "$captcha_completed" && message.author.id === config.OwnerID) {
         isSleeping = false;
         message.channel.send("Autocatcher Started!");
@@ -122,69 +115,75 @@ client.on('messageCreate', async message => {
             message.channel.send(say);
 
         } else if (message.content.startsWith("$react") && message.author.id == config.OwnerID) {
+            // (existing react command code omitted for brevity but intact)
             const args = message.content.slice(1).trim().split(/ +/g);
             if (!args[1]) {
                 message.reply(`Please specify the message ID as an argument like "$react <messageID>"`);
                 return;
             }
-
             let msg;
-            try {
-                msg = await message.channel.messages.fetch(args[1]);
-            } catch (err) {
-                message.reply(`Could not find a message with that ID.`);
-                console.log(err);
-                return;
-            }
-
-            try {
-                await msg.react("✅");
-                await message.react("✅");
-            } catch (err) {
-                message.react("❌");
-                console.log(err);
-            }
+            try { msg = await message.channel.messages.fetch(args[1]); } catch (err) { return message.reply(`Could not find a message with that ID.`); }
+            try { await msg.react("✅"); await message.react("✅"); } catch (err) { message.react("❌"); }
 
         } else if (message.content.startsWith("$click") && message.author.id == config.OwnerID) {
+            // (existing click command code omitted for brevity but intact)
             const args = message.content.slice(1).trim().split(/ +/g);
             if (!args[1]) {
                 message.reply(`Please specify the message ID as an argument like "$click <messageID>".`);
                 return;
             }
-
             let msg;
-            try {
-                msg = await message.channel.messages.fetch(args[1]);
-            } catch (err) {
-                message.reply(`Could not find a message with that ID.`);
-                console.log(err);
-                return;
-            }
-
-            try {
-                await msg.clickButton(); // Note: discord.js doesn't natively support message.clickButton(). You might need a specific package/workaround for this depending on your discord.js version.
-                await message.react("✅");
-            } catch (err) {
-                message.react("❌");
-                console.log(err);
-            }
+            try { msg = await message.channel.messages.fetch(args[1]); } catch (err) { return message.reply(`Could not find a message with that ID.`); }
+            try { await msg.clickButton(); await message.react("✅"); } catch (err) { message.react("❌"); }
 
         } else if (message.content == "That is the wrong pokémon!" && message.author.id == "716390085896962058") {
             message.channel.send(`<@716390085896962058> h`);
 
         } else if (message.author.id == "716390085896962058") {
-            if (message?.embeds[0]?.footer?.text.includes("Spawns Remaining")) {
+            
+            // 1. Detect a wild Pokemon Spawn
+            if (message.embeds.length > 0 && message.embeds[0].title && message.embeds[0].title.includes("wild pokémon")) {
+                
+                // Wait for the helper bot (854233015475109888) to respond with "Name: XX%"
+                const filter = m => m.author.id === "854233015475109888" && m.content.includes(":");
+                
+                try {
+                    // Start listener (Times out after 4000ms / 4 seconds)
+                    const collected = await message.channel.awaitMessages({ filter, max: 1, time: 4000, errors: ['time'] });
+                    const helperMsg = collected.first();
+                    
+                    // Parse the Pokemon name, remove formatting (like bold text **), trim spaces, make lowercase
+                    const pokemonName = helperMsg.content.split(":")[0].replace(/[*_`]/g, '').trim().toLowerCase();
+                    
+                    console.log(`[Helper Bot] Caught via Helper! Catching ${pokemonName}`);
+                    await message.channel.send(`<@716390085896962058> c ${pokemonName}`);
+                    
+                    // Rarity checking/logging (Same as hint method)
+                    let rarity;
+                    try { rarity = await checkRarity(pokemonName); } catch { rarity = "Not Found in Database"; }
+                    
+                    const channel6 = client.channels.cache.get(config.logChannelID);
+                    if (channel6) {
+                        channel6.send("[" + message.guild.name + "/#" + message.channel.name + "] " + "**__" + pokemonName + "__** " + "Rarity " + rarity);
+                    }
+
+                } catch (error) {
+                    // Timeout hit - Helper bot didn't respond in time. Fallback to Hint.
+                    console.log(`[Fallback] Helper Bot didn't respond. Sending hint command...`);
+                    await message.channel.send(`<@716390085896962058> h`);
+                }
+
+            } else if (message?.embeds[0]?.footer?.text.includes("Spawns Remaining")) {
                 await message.channel.send(`<@716390085896962058> h`);
                 if ((message.embeds[0]?.footer?.text == "Incense: Active.\nSpawns Remaining: 0.")) {
                     message.channel.send(`<@716390085896962058> buy incense`);
                 }
 
+            // Existing logic to catch using hints
             } else if (message.content.includes("The pokémon is")) {
-                if (allowedChannels.length > 0 && !allowedChannels.includes(message.channel.id)) return;
-
                 let rarity;
                 const pokemon = await solveHint(message);
-                console.log(`Catching ${pokemon[0]}`);
+                console.log(`[Hint Bot] Catching ${pokemon[0]}`);
                 await message.channel.send(`<@716390085896962058> c ${pokemon[0]}`);
 
                 console.log("[" + message.guild.name + "/#" + message.channel.name + "] " + pokemon[0]);
@@ -203,4 +202,4 @@ client.on('messageCreate', async message => {
     }
 });
 
-client.login(config.TOKEN); // use process.env.TOKEN if you are using it in repl.it
+client.login(config.TOKEN);
